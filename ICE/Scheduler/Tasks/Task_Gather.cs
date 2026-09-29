@@ -423,7 +423,6 @@ namespace ICE.Scheduler.Tasks
                 Mission_Settings.nodeCounter = fallbackIndex >= 0 ? fallbackIndex : 0;
             }
         }
-        private const float SmartRoutingThreshold = 50f;
         public static bool? PathandCheckNode()
         {
             var zoneId = Player.Territory;

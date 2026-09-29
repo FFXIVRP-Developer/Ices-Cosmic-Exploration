@@ -138,7 +138,9 @@ namespace ICE.Ui.Debug_Tabs.Debug_Ui
             }
 
             bool CollectablesUnlocked = QuestCheck.CollectablesUnlocked();
+            bool ReduceUnlocked = QuestCheck.ReductionUnlocked();
             ImGui.Text($"Collectbles unlocked on this character: {CollectablesUnlocked}");
+            ImGui.Text($"Reduction unlocked: {ReduceUnlocked}");
             // ImGui.Text($"Any need repaired: {PlayerHelper.AnyNeedsRepair(99)}");
         }
 

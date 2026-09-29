@@ -42,7 +42,7 @@ namespace ICE.Ui.MainUi
                 }
                 if (ImGui_Ice.Sidebar_CollaspableHeader("Planet Selection", SidebarTabs.PlanetSelection, FontAwesomeIcon.Moon))
                 {
-                    if (ImGui_Ice.SliderButton("AutoSelectMoon", "Auto Select", ref autoSelectMoon))
+                    if (ImGui_Ice.SliderButton("AutoSelectMoon", "Auto View", ref autoSelectMoon))
                     {
                         C.AutoSelectMoon = autoSelectMoon;
                         C.Save();
@@ -137,7 +137,7 @@ namespace ICE.Ui.MainUi
                     float iconSpacing = 4;
                     float leftOffset = 10f; // Simple offset from the current position
 
-                    if (ImGui_Ice.SliderButton("AutoSelectJob", "Auto Select Job", ref autoSelectedJob))
+                    if (ImGui_Ice.SliderButton("AutoSelectJob", "Auto View Job", ref autoSelectedJob))
                     {
                         C.AutoPickCurrentJob = autoSelectedJob;
                         C.Save();

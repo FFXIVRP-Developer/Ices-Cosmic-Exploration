@@ -1,4 +1,4 @@
-﻿using ECommons.GameHelpers;
+using ECommons.GameHelpers;
 using ICE.Utilities.Cosmic_Helper;
 using System;
 using System.Collections.Generic;
@@ -186,6 +186,9 @@ namespace ICE.Scheduler.Tasks
                 if (EzThrottler.Throttle($"Selecting jobId: {TurninJob}"))
                 {
                     if (Fork.ForkRelicGuard.Blocker(TurninJob) is { } why) return Fork.ForkRelicGuard.AbortHandIn(why); // Fork: item 1
+                    var forkEntry = Fork.ForkRelicGuard.SelectRelicEntry(selectIconString, TurninJob); // Fork: item 1 (by name, not position)
+                    if (forkEntry < 0) return Fork.ForkRelicGuard.AbortHandIn($"no single entry for job {TurninJob} in the class list"); // Fork: item 1
+                    selectedEntry = (uint)forkEntry; // Fork: item 1
                     IceLogging.Debug($"Selecting Entry: {selectedEntry} for job: {TurninJob} to turnin relic");
                     selectIconString.Entries[selectedEntry].Select();
                 }
@@ -195,6 +198,7 @@ namespace ICE.Scheduler.Tasks
                 if (EzThrottler.Throttle("Selecting yes for turnin"))
                 {
                     if (Fork.ForkRelicGuard.Blocker(TurninJob) is { } why) return Fork.ForkRelicGuard.AbortHandIn(why); // Fork: item 1
+                    if (Fork.ForkRelicGuard.OtherClassInPrompt(selectYesno.Text, TurninJob) is { } wrong) return Fork.ForkRelicGuard.AbortHandIn(wrong); // Fork: item 1
                     IceLogging.Verbose("Selecting yes for the turnin");
                     selectYesno.Yes();
                 }

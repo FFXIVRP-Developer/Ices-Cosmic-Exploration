@@ -40,7 +40,10 @@ internal static class ForkAutoRetainer
     private static bool gaveUp;
     private static string? bellName;
 
-    public static bool Available => Svc.PluginInterface.InstalledPlugins.Any(p => p.InternalName == "AutoRetainer" && p.IsLoaded);
+    /// <summary>The game has a Cosmic mission running (only ever the case on the moon).</summary>
+    private static bool MissionInProgress => PlayerHelper.IsInCosmicZone() && CosmicHelper.CurrentLunarMission != 0;
+
+    public static bool Available =>Svc.PluginInterface.InstalledPlugins.Any(p => p.InternalName == "AutoRetainer" && p.IsLoaded);
 
     /// <summary>ICE's own retainer stop is under way (its steps are in ICE's queue).</summary>
     public static bool InBreak =>
@@ -64,7 +67,8 @@ internal static class ForkAutoRetainer
         if (!Available) return;
         try
         {
-            if (SchedulerMain.State != IceState.Idle && !InBreak) Hold();
+            // Held while ICE runs, and while any mission is in progress (ICE stopped by hand mid-mission too).
+            if ((SchedulerMain.State != IceState.Idle && !InBreak) || MissionInProgress) Hold();
             else Release();
         }
         catch (Exception ex)
@@ -135,7 +139,7 @@ internal static class ForkAutoRetainer
     {
         try
         {
-            if (!C.Fork_RetainersBetweenMissions || !Available || CosmicHelper.CurrentLunarMission != 0) return false;
+            if (!C.Fork_RetainersBetweenMissions || !Available || MissionInProgress) return false;
             if (Environment.TickCount64 - lastBreakMs < CooldownMs || !RetainersReady()) return false;
             if (FindBell() is not { } bell)
             {
@@ -172,6 +176,12 @@ internal static class ForkAutoRetainer
     {
         stepStartMs = Environment.TickCount64;
         sawBusy = false;
+        // Never during a mission: if one is somehow running, the rest of the stop is skipped.
+        if (MissionInProgress && !gaveUp)
+        {
+            IceLogging.Warning("A mission is in progress; the retainer stop is skipped until it is over.", Tag);
+            gaveUp = true;
+        }
         return true;
     }
 

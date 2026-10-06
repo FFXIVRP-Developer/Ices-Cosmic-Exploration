@@ -18,7 +18,9 @@ on branch `fork/guards`. Kept as close to upstream as possible: the fork's code 
    told to craft until the character is on foot: the guard dismounts and waits. `ForkMountGuard.cs`.
 3. **AutoRetainer.** While ICE runs, AutoRetainer is suppressed (its IPC) and its "Artisan integration" held off on its
    live config (that integration stops Artisan whenever ventures are ready and a bell is in reach, suppressed or not;
-   mid-mission ICE looped). Both are given back when ICE is idle; the held value is kept in ICE's config, so a crash or
+   mid-mission ICE looped). Held as well whenever the game has a mission in progress, even with ICE stopped by hand;
+   the retainer stop is only queued once the mission is turned in and re-checks before each step. Both are given back
+   when ICE is idle and no mission runs; the held value is kept in ICE's config, so a crash or
    reload still gives it back. Between missions, with a retainer ready and a summoning bell within 150 m, ICE walks
    there, lets AutoRetainer collect them, closes the bell and carries on (no travel beyond that; 10 min between stops;
    each step gives up after a timeout instead of stalling ICE). Setting: "Retainers between missions" under

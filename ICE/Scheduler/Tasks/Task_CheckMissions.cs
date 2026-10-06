@@ -952,6 +952,7 @@ namespace ICE.Scheduler.Tasks
                 (
                     new(() => CheckForMovementRequired(missionId), "Checking to see if we need to move to mission"),
                     new(() => Mission_ChangeJob(missionId), "Changing to correct job for mission"),
+                    new(() => Fork.ForkMountGuard.ReadyForMission(missionId), "Fork: on foot before a crafting mission"), // Fork: item 2
                     new(() => GrabMission(missionId), "Grabbing mission to initate")
                 );
         }

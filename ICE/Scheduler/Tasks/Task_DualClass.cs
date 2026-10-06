@@ -119,6 +119,7 @@ namespace ICE.Scheduler.Tasks
                     GearsetHandler.TaskClassChange((Job)crafterJobId);
                 return false;
             }
+            if (!Fork.ForkMountGuard.ReadyToCraft()) return false; // Fork: item 2
 
             if (PlayerHelper.GetItemCount(itemId, out var count) && count < dualCraftAmount)
             {

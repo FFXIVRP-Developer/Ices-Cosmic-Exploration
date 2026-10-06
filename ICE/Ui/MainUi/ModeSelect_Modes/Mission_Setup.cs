@@ -301,6 +301,7 @@ namespace ICE.Ui.MainUi.ModeSelect_Modes
                                          "4: If you're on a crafting class, it will return you back to the stop you were crafting post turnin. \n" +
                                          "\t- This is optional, you can disable it at your own free will, I just like this so I can just go back to an isolated area of my choosing");
                     }
+                    Fork.ForkUi.Draw(); // Fork: items 1, 3
 
                     ImGui.Separator();
                     bool relic_AllowRedAlert = C.Relic_IncludeCriticals;

@@ -29,6 +29,7 @@ namespace ICE.Scheduler.Tasks
         {
             IceLogging.Verbose("Registering what job to turn in on");
             TurninJob = (uint)Player.Job;
+            if (Fork.ForkRelicGuard.Blocker(TurninJob) is { } why) return Fork.ForkRelicGuard.AbortHandIn(why); // Fork: item 1
 
             return true;
         }
@@ -184,6 +185,7 @@ namespace ICE.Scheduler.Tasks
             {
                 if (EzThrottler.Throttle($"Selecting jobId: {TurninJob}"))
                 {
+                    if (Fork.ForkRelicGuard.Blocker(TurninJob) is { } why) return Fork.ForkRelicGuard.AbortHandIn(why); // Fork: item 1
                     IceLogging.Debug($"Selecting Entry: {selectedEntry} for job: {TurninJob} to turnin relic");
                     selectIconString.Entries[selectedEntry].Select();
                 }
@@ -192,6 +194,7 @@ namespace ICE.Scheduler.Tasks
             {
                 if (EzThrottler.Throttle("Selecting yes for turnin"))
                 {
+                    if (Fork.ForkRelicGuard.Blocker(TurninJob) is { } why) return Fork.ForkRelicGuard.AbortHandIn(why); // Fork: item 1
                     IceLogging.Verbose("Selecting yes for the turnin");
                     selectYesno.Yes();
                 }

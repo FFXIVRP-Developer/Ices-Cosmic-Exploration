@@ -498,6 +498,7 @@ namespace ICE.Scheduler.Tasks
             string tag = "Task Check State: Hub Activity Check";
 
             IceLogging.Verbose("Starting Hub Activity Checks", tag);
+            if (Fork.ForkAutoRetainer.TryEnqueueBreak()) return true; // Fork: item 3
 
             var territoryId = Player.Territory.RowId;
             var relicProgress = CosmicHelper.Cosmic_ClassInfo();
@@ -602,7 +603,7 @@ namespace ICE.Scheduler.Tasks
                             IceLogging.Verbose($"Kind [{exp.Key}] | Current: [{exp.Value.Current}] / Needed: [{exp.Value.Needed}] | Max: [{exp.Value.Max}]", tag);
                             canTurnin &= exp.Value.Current >= exp.Value.Needed;
                         }
-                        TurninRelic = isUpgradable && canTurnin;
+                        TurninRelic = isUpgradable && canTurnin && Fork.ForkRelicGuard.AllowsHandIn(jobId); // Fork: item 1
                         IceLogging.Verbose($"Are we expecting to turnin the relic? | [{TurninRelic}]", tag);
                     }
                     else

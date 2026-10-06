@@ -91,6 +91,7 @@ namespace ICE.Scheduler.Tasks
 
             if (throttleCounter >= 3)
             {
+                if (!Fork.ForkMountGuard.ReadyToCraft()) return false; // Fork: item 2
                 if (EzThrottler.Throttle("Artisan Crafting Task"))
                 {
                     IceLogging.Debug($"Telling Artisan to craft: {itemId} -> {amount} times");

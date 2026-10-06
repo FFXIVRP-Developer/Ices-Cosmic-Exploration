@@ -25,7 +25,7 @@ on branch `fork/guards`. Kept as close to upstream as possible: the fork's code 
    there, lets AutoRetainer collect them, closes the bell and carries on (no travel beyond that; 10 min between stops;
    each step gives up after a timeout instead of stalling ICE). Setting: "Retainers between missions" under
    "Turnin if relic is complete". `ForkAutoRetainer.cs`.
-4. **IPC** (prefix `ICE.`, next to upstream's): `IsFork()`, `RelicHandInBlocker(uint job)` ("" = allowed),
+4. **IPC** (prefix `ICE.`, next to upstream's): `IsFork()`, `IsBusy()`, `RelicHandInBlocker(uint job)` ("" = allowed),
    `IsInRetainerBreak()`, `GetSetting(string)` / `SetSetting(string, bool)` for `TurninRelic`, `StopAfterCurrent`
    (read only) and `RetainersBetweenMissions`. `ForkIpc.cs`.
 

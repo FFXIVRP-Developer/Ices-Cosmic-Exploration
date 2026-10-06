@@ -14,6 +14,9 @@ public class ForkIpc
     /// <summary>True: this ICE carries the fork's guards (relic level gate, mount guard, AutoRetainer handling).</summary>
     [EzIPC] public bool IsFork() => true;
 
+    /// <summary>The local plugins' standard status call: ICE is working (a mission, the hub, a retainer stop).</summary>
+    [EzIPC] public bool IsBusy() => SchedulerMain.State != IceState.Idle || ForkAutoRetainer.InBreak;
+
     /// <summary>Why a relic hand-in for this job (8-18) would be held now; "" when it may go ahead.</summary>
     [EzIPC] public string RelicHandInBlocker(uint job) => ForkRelicGuard.Blocker(job) ?? "";
 

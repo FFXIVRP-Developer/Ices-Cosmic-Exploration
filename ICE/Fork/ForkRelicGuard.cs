@@ -63,7 +63,17 @@ internal static class ForkRelicGuard
         }
 
         if (owned == 0)
-            return level >= top ? null : $"no Cosmic Prototype tool for {abbr} found in the worn gear, armoury chest or bags (Lv {level})";
+        {
+            if (level >= top) return null;
+            // No tool owned: at research stage 0 the hand-in gives the first Prototype (v0.1); past it, the tool is
+            // somewhere this cannot see (retainer, saddlebag, armoire), so held.
+            var stage = CosmicHelper.Cosmic_ClassInfo().TryGetValue(job, out var info) ? info : null;
+            if (stage is null || stage.Stage_Next == 0) return "the Cosmic research data is not loaded yet";
+            var first = tools.Values.Min();
+            if (stage.Stage_Current == 0)
+                return level >= first ? null : $"{abbr} Lv {level} cannot wear its first Cosmic tool (Lv {first})";
+            return $"{abbr} is at research stage {stage.Stage_Current} but no Cosmic Prototype tool for it is in the worn gear, armoury chest or bags (Lv {level})";
+        }
         var next = tools.Values.Where(l => l > owned).DefaultIfEmpty(0).Min();
         if (next == 0) return null; // the last Prototype: what follows is Lv {top}, which the class already reached to wear this one
         return level < next ? $"{abbr} Lv {level} cannot wear its next Cosmic tool stage (Lv {next}; it holds the Lv {owned} one)" : null;

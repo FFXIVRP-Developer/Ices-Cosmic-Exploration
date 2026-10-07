@@ -36,7 +36,7 @@ namespace ICE.Scheduler.Tasks
 
         public static bool? CheckJobSwap()
         {
-            if (Char_Info.Relic_SwapJob && Char_Info.Relic_BattleJob != 0)
+            if (Char_Info.Relic_SwapJob && Char_Info.Relic_BattleJob != 0 && Fork.ForkJobSwapGuard.CanSwapTo(Char_Info.Relic_BattleJob)) // Fork: item 5
             {
                 if (Player.Job != (Job)Char_Info.Relic_BattleJob)
                 {
@@ -55,7 +55,7 @@ namespace ICE.Scheduler.Tasks
                     return true;
                 }
             }
-            else if ((uint)Player.Job != Mission_Settings.SelectedJob)
+            else if ((uint)Player.Job != Mission_Settings.SelectedJob && Fork.ForkJobSwapGuard.CanSwapTo(Mission_Settings.SelectedJob)) // Fork: item 5
             {
                 if (EzThrottler.Throttle("Swapping jobs", 1000))
                 {

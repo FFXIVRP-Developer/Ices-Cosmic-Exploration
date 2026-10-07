@@ -34,6 +34,10 @@ on branch `fork/guards`. Kept as close to upstream as possible: the fork's code 
 4. **IPC** (prefix `ICE.`, next to upstream's): `IsFork()`, `IsBusy()`, `RelicHandInBlocker(uint job)` ("" = allowed),
    `IsInRetainerBreak()`, `GetSetting(string)` / `SetSetting(string, bool)` for `TurninRelic`, `StopAfterCurrent`
    (read only) and `RetainersBetweenMissions`. `ForkIpc.cs`.
+5. **No swap to a job without a gear set.** The relic hand-in swaps to the "relic battle job" (or the mission job) and
+   upstream waits for that swap forever, asking every second; with no gear set for that job it can never happen and ICE
+   stood at the hub with no mission. The swap is skipped (logged once a minute) and the hand-in goes on as the class worn,
+   which item 1 still judges. `ForkJobSwapGuard.cs`.
 
 ## Hook points (for merges from upstream)
 
@@ -41,7 +45,7 @@ on branch `fork/guards`. Kept as close to upstream as possible: the fork's code 
 |---|---|
 | `ICE.cs` | `Load`: `ForkIpc = new(); Fork.ForkAutoRetainer.Init(); Fork.ForkRelicGuard.Init();` · `Dispose`: `Fork.ForkAutoRetainer.Dispose`, `Fork.ForkRelicGuard.Dispose` |
 | `Task_CheckState.cs` | `HubActivityCheck`: retainer stop at the top; `&& ForkRelicGuard.AllowsHandIn(jobId)` on `TurninRelic` |
-| `Task_RelicTurnin.cs` | `RegisterJob`, before the class entry click, before the Yes click: `Blocker` → `AbortHandIn`; the class entry from `SelectRelicEntry` (by name); before Yes: `OtherClassInPrompt` |
+| `Task_RelicTurnin.cs` | `RegisterJob`, before the class entry click, before the Yes click: `Blocker` → `AbortHandIn`; the class entry from `SelectRelicEntry` (by name); before Yes: `OtherClassInPrompt`; `CheckJobSwap`: `&& ForkJobSwapGuard.CanSwapTo(...)` on both swaps (item 5) |
 | `Task_CheckMissions.cs` | `Insert_GrabMissionTask`: `ForkMountGuard.ReadyForMission` before `GrabMission` |
 | `Task_Craft.cs` | `ThrottleArtisanTaskV2`: `ForkMountGuard.ReadyToCraft` before `CraftItem` |
 | `Task_DualClass.cs` | after the crafter job swap: `ForkMountGuard.ReadyToCraft` |

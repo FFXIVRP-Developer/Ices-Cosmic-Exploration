@@ -20,7 +20,9 @@ on branch `fork/guards`. Kept as close to upstream as possible: the fork's code 
    YesAlready is held while any hand-in step is queued (upstream only holds it for taking or abandoning a mission), so
    it cannot confirm before the guard; it is given back as soon as none is. A hand-in that must not go on is aborted,
    the menus shut and ICE starts over. This covers every way into the hand-in, the debug "Relic Turnin" button
-   included. `ForkRelicGuard.cs`.
+   included. Setting: "Only hand in a relic the class's level can wear" (on by default); off, the level and
+   tool-on-hand checks are skipped and any complete research is handed in (the by-name pick and the confirmation check
+   stay). `ForkRelicGuard.cs`.
 2. **No crafting while mounted.** A crafting mission (dual missions too) is not taken while mounted, and Artisan is not
    told to craft until the character is on foot: the guard dismounts and waits. `ForkMountGuard.cs`.
 3. **AutoRetainer.** While ICE runs, AutoRetainer is suppressed (its IPC) and its "Artisan integration" held off on its
@@ -40,13 +42,16 @@ on branch `fork/guards`. Kept as close to upstream as possible: the fork's code 
    stood at the hub with no mission. The swap is skipped (logged once a minute) and the hand-in goes on as the class worn,
    which item 1 still judges. `ForkJobSwapGuard.cs`.
 6. **Every class's relic, and the right class.** At the hub every unlocked class is considered, ICE's own job first:
-   a class's tool is handed in when its research is complete (upstream's reading), item 1 lets it go (the class can
+   a class's tool is handed in when its research is complete (upstream's reading, plus: the next stage needs some
+   data; a stage whose needs all read 0 is not one the game asks for), item 1 lets it go (the class can
    wear what the hand-in gives) and the class can be worn for the hand-in (a gear set, the relic battle job, or worn
    already). One class per hub visit; ICE comes back for the next. The hand-in registers, swaps to and judges that
    class; upstream judged ICE's job but registered the class worn, then swapped to ICE's job, and looped (an agenda
    that moved from Armorer to Goldsmith: swapped to Goldsmith, refused, back to Armorer, every 12 s). A hand-in
    that reaches the NPC's end with the research stage unchanged was refused: logged to dalamud.log with ICE's
-   reading, and that class is not tried again while its research reads the same (or for 30 min). Hand-ins due and
+   reading (research data, stage, level and the game's unlocked stage for that class), kept in the config, and that
+   class is not tried again, even after a reload, until that reading changes. This is the only way ICE goes to the
+   research NPC (besides the debug button). Hand-ins due and
    held are logged to dalamud.log too. Setting: "Hand in every class's relic" (on by default; off = ICE's job
    only, still with the right-class fix). `ForkRelicQueue.cs`.
 

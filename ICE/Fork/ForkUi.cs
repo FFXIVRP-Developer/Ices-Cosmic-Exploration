@@ -14,6 +14,19 @@ internal static class ForkUi
             ImGui.TextDisabled(why is null ? "Fork: relic hand-in allowed for this class." : $"Fork: relic hand-in held: {why}.");
         }
 
+        var levelGate = C.Fork_RelicLevelGate;
+        if (ImGui.Checkbox("Only hand in a relic the class's level can wear##Fork", ref levelGate))
+        {
+            C.Fork_RelicLevelGate = levelGate;
+            C.Save();
+        }
+        ImGui.SameLine();
+        ImGui.TextDisabled("?");
+        if (ImGui.IsItemHovered())
+            ImGui.SetTooltip("Fork: on, a class's tool is only handed in when that class's level on this character can wear what\n" +
+                             "the hand-in gives, and its current tool is on hand (worn, armoury chest or bags).\n" +
+                             "Off: any class whose research is complete is handed in, whatever its level.");
+
         var allClasses = C.Fork_RelicAllClasses;
         if (ImGui.Checkbox("Hand in every class's relic, not only this class's##Fork", ref allClasses))
         {

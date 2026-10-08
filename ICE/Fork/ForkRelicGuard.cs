@@ -62,6 +62,7 @@ internal static class ForkRelicGuard
     public static unsafe string? Blocker(uint job)
     {
         if (job is < 8 or > 18) return $"job {job} is not a crafter or gatherer";
+        if (!C.Fork_RelicLevelGate) return null; // the user turned the level rule off
         var abbr = Svc.Data.GetExcelSheet<ClassJob>().GetRowOrDefault(job)?.Abbreviation.ExtractText() ?? job.ToString();
 
         var manager = InventoryManager.Instance();

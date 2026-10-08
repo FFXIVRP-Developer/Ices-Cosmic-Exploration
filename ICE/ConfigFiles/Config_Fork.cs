@@ -11,4 +11,7 @@ public partial class Config
     ///     is in reach). Null when nothing is held; given back to AutoRetainer once ICE is idle, also after a crash or reload.
     /// </summary>
     public bool? Fork_ArtisanIntegrationHeld { get; set; } = null;
+
+    /// <summary>Fork item 6: hand in every class's relic tool whose research is complete, not only the class ICE works on.</summary>
+    public bool Fork_RelicAllClasses { get; set; } = true;
 }

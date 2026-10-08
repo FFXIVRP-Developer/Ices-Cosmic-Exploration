@@ -20,7 +20,8 @@ on branch `fork/guards`. Kept as close to upstream as possible: the fork's code 
    YesAlready is held while any hand-in step is queued (upstream only holds it for taking or abandoning a mission), so
    it cannot confirm before the guard; it is given back as soon as none is. A hand-in that must not go on is aborted,
    the menus shut and ICE starts over. This covers every way into the hand-in, the debug "Relic Turnin" button
-   included. `ForkRelicGuard.cs`.2. **No crafting while mounted.** A crafting mission (dual missions too) is not taken while mounted, and Artisan is not
+   included. `ForkRelicGuard.cs`.
+2. **No crafting while mounted.** A crafting mission (dual missions too) is not taken while mounted, and Artisan is not
    told to craft until the character is on foot: the guard dismounts and waits. `ForkMountGuard.cs`.
 3. **AutoRetainer.** While ICE runs, AutoRetainer is suppressed (its IPC) and its "Artisan integration" held off on its
    live config (that integration stops Artisan whenever ventures are ready and a bell is in reach, suppressed or not;
@@ -38,14 +39,24 @@ on branch `fork/guards`. Kept as close to upstream as possible: the fork's code 
    upstream waits for that swap forever, asking every second; with no gear set for that job it can never happen and ICE
    stood at the hub with no mission. The swap is skipped (logged once a minute) and the hand-in goes on as the class worn,
    which item 1 still judges. `ForkJobSwapGuard.cs`.
+6. **Every class's relic, and the right class.** At the hub every unlocked class is considered, ICE's own job first:
+   a class's tool is handed in when its research is complete (upstream's reading), item 1 lets it go (the class can
+   wear what the hand-in gives) and the class can be worn for the hand-in (a gear set, the relic battle job, or worn
+   already). One class per hub visit; ICE comes back for the next. The hand-in registers, swaps to and judges that
+   class; upstream judged ICE's job but registered the class worn, then swapped to ICE's job, and looped (an agenda
+   that moved from Armorer to Goldsmith: swapped to Goldsmith, refused, back to Armorer, every 12 s). A hand-in
+   that reaches the NPC's end with the research stage unchanged was refused: logged to dalamud.log with ICE's
+   reading, and that class is not tried again while its research reads the same (or for 30 min). Hand-ins due and
+   held are logged to dalamud.log too. Setting: "Hand in every class's relic" (on by default; off = ICE's job
+   only, still with the right-class fix). `ForkRelicQueue.cs`.
 
 ## Hook points (for merges from upstream)
 
 | File | Hook |
 |---|---|
 | `ICE.cs` | `Load`: `ForkIpc = new(); Fork.ForkAutoRetainer.Init(); Fork.ForkRelicGuard.Init();` · `Dispose`: `Fork.ForkAutoRetainer.Dispose`, `Fork.ForkRelicGuard.Dispose` |
-| `Task_CheckState.cs` | `HubActivityCheck`: retainer stop at the top; `&& ForkRelicGuard.AllowsHandIn(jobId)` on `TurninRelic` |
-| `Task_RelicTurnin.cs` | `RegisterJob`, before the class entry click, before the Yes click: `Blocker` → `AbortHandIn`; the class entry from `SelectRelicEntry` (by name); before Yes: `OtherClassInPrompt`; `CheckJobSwap`: `&& ForkJobSwapGuard.CanSwapTo(...)` on both swaps (item 5) |
+| `Task_CheckState.cs` | `HubActivityCheck`: retainer stop at the top; after the relic block: `TurninRelic = ForkRelicQueue.Pick(SelectedJob)` (items 1, 6) |
+| `Task_RelicTurnin.cs` | `RegisterJob`: `TurninJob = ForkRelicQueue.StartHandIn()` (item 6); `RegisterJob`, before the class entry click, before the Yes click: `Blocker` → `AbortHandIn`; the class entry from `SelectRelicEntry` (by name); before Yes: `OtherClassInPrompt`; `CheckJobSwap`: `&& ForkJobSwapGuard.CanSwapTo(...)` on both swaps (item 5), the second swap to `TurninJob` instead of `Mission_Settings.SelectedJob` and an abort when the class worn is still not `TurninJob` (item 6); end of the NPC talk: `ForkRelicQueue.HandInEnded()` |
 | `Task_CheckMissions.cs` | `Insert_GrabMissionTask`: `ForkMountGuard.ReadyForMission` before `GrabMission` |
 | `Task_Craft.cs` | `ThrottleArtisanTaskV2`: `ForkMountGuard.ReadyToCraft` before `CraftItem` |
 | `Task_DualClass.cs` | after the crafter job swap: `ForkMountGuard.ReadyToCraft` |

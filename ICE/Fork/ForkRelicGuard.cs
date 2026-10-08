@@ -27,7 +27,7 @@ namespace ICE.Fork;
 ///         The class is always the one whose relic is exchanged (user, 2026-10-05: "the handin must match the relic with the job
 ///         it belongs to"): never judged by the class worn alone. The NPC's class list is read by name (SelectRelicEntry), not
 ///         by counting positions, and the confirmation is refused when it names another class's tool. Checked when ICE decides
-///         to go to the hub (ICE's job and the class worn), when the hand-in starts, before the class is picked and before the
+///         to go to the hub (each class the relic queue, item 6, considers), when the hand-in starts, before the class is picked and before the
 ///         confirmation.
 ///     </para>
 /// </summary>
@@ -106,16 +106,6 @@ internal static class ForkRelicGuard
         return level < needs
             ? $"{abbr} Lv {level} cannot wear what the hand-in gives ({ItemName(tools[gives])}, Lv {needs})"
             : null;
-    }
-
-    /// <summary>True when a hand-in may go ahead for ICE's job and the class worn (the hand-in registers the worn one).</summary>
-    public static bool AllowsHandIn(uint selectedJob)
-    {
-        var why = Blocker(selectedJob) ?? Blocker((uint)Player.Job);
-        if (why is null) return true;
-        if (EzThrottler.Throttle("Fork relic guard: held", 60_000))
-            IceLogging.Info($"Relic hand-in held: {why}.", Tag);
-        return false;
     }
 
     /// <summary>
@@ -217,6 +207,7 @@ internal static class ForkRelicGuard
     public static bool? AbortHandIn(string why)
     {
         IceLogging.ChatError($"Relic hand-in stopped: {why}.", "[I.C.E. fork]");
+        ForkRelicQueue.Forget();
         Task_HubActivities.RelicTurnin = false;
         CloseMenus();
         P.TaskManager.Abort();

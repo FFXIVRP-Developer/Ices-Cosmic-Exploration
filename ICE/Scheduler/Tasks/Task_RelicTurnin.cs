@@ -28,7 +28,7 @@ namespace ICE.Scheduler.Tasks
         public static bool? RegisterJob()
         {
             IceLogging.Verbose("Registering what job to turn in on");
-            TurninJob = (uint)Player.Job;
+            TurninJob = Fork.ForkRelicQueue.StartHandIn(); // Fork: item 6 (upstream: the class worn)
             if (Fork.ForkRelicGuard.Blocker(TurninJob) is { } why) return Fork.ForkRelicGuard.AbortHandIn(why); // Fork: item 1
 
             return true;
@@ -55,17 +55,18 @@ namespace ICE.Scheduler.Tasks
                     return true;
                 }
             }
-            else if ((uint)Player.Job != Mission_Settings.SelectedJob && Fork.ForkJobSwapGuard.CanSwapTo(Mission_Settings.SelectedJob)) // Fork: item 5
+            else if ((uint)Player.Job != TurninJob && Fork.ForkJobSwapGuard.CanSwapTo(TurninJob)) // Fork: items 5, 6 (upstream: Mission_Settings.SelectedJob)
             {
                 if (EzThrottler.Throttle("Swapping jobs", 1000))
                 {
-                    IceLogging.Verbose($"Telling the game to swap you to jobID: {Mission_Settings.SelectedJob}");
-                    GearsetHandler.TaskClassChange((Job)Mission_Settings.SelectedJob);
+                    IceLogging.Verbose($"Telling the game to swap you to jobID: {TurninJob}");
+                    GearsetHandler.TaskClassChange((Job)TurninJob); // Fork: item 6 (upstream: Mission_Settings.SelectedJob)
                 }
                 return false;
             }
             else
             {
+                if ((uint)Player.Job != TurninJob) return Fork.ForkRelicGuard.AbortHandIn($"cannot wear class {TurninJob} for its hand-in"); // Fork: item 6
                 IceLogging.Debug("No swap is necessary/not configured properly. Continuing on");
                 return true;
             }
@@ -214,6 +215,7 @@ namespace ICE.Scheduler.Tasks
             else if (!Player.IsBusy)
             {
                 IceLogging.Info("No longer busy talking to researchingway, to we're done");
+                Fork.ForkRelicQueue.HandInEnded(); // Fork: item 6
                 if (Char_Info.Relic_SwapJob)
                 {
                     if (C.Relic_Stylist)

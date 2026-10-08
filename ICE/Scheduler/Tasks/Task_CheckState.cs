@@ -603,7 +603,7 @@ namespace ICE.Scheduler.Tasks
                             IceLogging.Verbose($"Kind [{exp.Key}] | Current: [{exp.Value.Current}] / Needed: [{exp.Value.Needed}] | Max: [{exp.Value.Max}]", tag);
                             canTurnin &= exp.Value.Current >= exp.Value.Needed;
                         }
-                        TurninRelic = isUpgradable && canTurnin && Fork.ForkRelicGuard.AllowsHandIn(jobId); // Fork: item 1
+                        TurninRelic = isUpgradable && canTurnin;
                         IceLogging.Verbose($"Are we expecting to turnin the relic? | [{TurninRelic}]", tag);
                     }
                     else
@@ -616,6 +616,7 @@ namespace ICE.Scheduler.Tasks
                     }
                 }
             }
+            if (C.TurninRelic) TurninRelic = Fork.ForkRelicQueue.Pick(Mission_Settings.SelectedJob); // Fork: items 1, 6
 
             if (BuyDrones || GambaWheel || BuyItems || RepairVendor || TurninRelic)
             {

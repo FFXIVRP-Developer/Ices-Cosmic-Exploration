@@ -14,6 +14,19 @@ internal static class ForkUi
             ImGui.TextDisabled(why is null ? "Fork: relic hand-in allowed for this class." : $"Fork: relic hand-in held: {why}.");
         }
 
+        var allClasses = C.Fork_RelicAllClasses;
+        if (ImGui.Checkbox("Hand in every class's relic, not only this class's##Fork", ref allClasses))
+        {
+            C.Fork_RelicAllClasses = allClasses;
+            C.Save();
+        }
+        ImGui.SameLine();
+        ImGui.TextDisabled("?");
+        if (ImGui.IsItemHovered())
+            ImGui.SetTooltip("Fork: at the hub, any unlocked class whose research is complete has its tool handed in, one per visit,\n" +
+                             "always only when that class's level can wear what the hand-in gives (the relic guard).\n" +
+                             "A hand-in the NPC refuses is logged and not tried again until that class's research changes.");
+
         var retainers = C.Fork_RetainersBetweenMissions;
         if (ImGui.Checkbox("Retainers between missions (AutoRetainer, nearby bell)##Fork", ref retainers))
         {

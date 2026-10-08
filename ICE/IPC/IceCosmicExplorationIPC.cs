@@ -1,4 +1,4 @@
-﻿using ECommons.EzIpcManager;
+using ECommons.EzIpcManager;
 using ICE.Utilities.Cosmic_Helper;
 using System;
 using System.Collections.Generic;
@@ -22,6 +22,7 @@ public class IceCosmicExplorationIPC
     }
     [EzIPC] public void Enable()
     {
+        Fork.ForkHardStop.Clear(); // Fork item 7: a start clears a hard stop never carried out
         SchedulerMain.EnablePlugin();
     }
     [EzIPC] public void Disable()

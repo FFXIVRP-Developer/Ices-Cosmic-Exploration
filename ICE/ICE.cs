@@ -72,7 +72,7 @@ public sealed partial class ICE : IDalamudPlugin
         IceIpc = new();
         GlamourIpc = new(Svc.PluginInterface);
         NotificationIPC = new();
-        ForkIpc = new(); Fork.ForkAutoRetainer.Init(); Fork.ForkRelicGuard.Init(); // Fork: items 1, 3, 4
+        ForkIpc = new(); Fork.ForkAutoRetainer.Init(); Fork.ForkRelicGuard.Init(); Fork.ForkHardStop.Init(); // Fork: items 1, 3, 4, 7
 
         // all the windows
         windowSystem = new();
@@ -208,7 +208,7 @@ public sealed partial class ICE : IDalamudPlugin
         GenericHelpers.Safe(TextAdvancedManager.UnlockTA);
         GenericHelpers.Safe(YesAlreadyManager.Unlock);
         GenericHelpers.Safe(PictoService.Dispose);
-        GenericHelpers.Safe(Fork.ForkAutoRetainer.Dispose); GenericHelpers.Safe(Fork.ForkRelicGuard.Dispose); // Fork: items 1, 3
+        GenericHelpers.Safe(Fork.ForkAutoRetainer.Dispose); GenericHelpers.Safe(Fork.ForkRelicGuard.Dispose); GenericHelpers.Safe(Fork.ForkHardStop.Dispose); // Fork: items 1, 3, 7
         ECommonsMain.Dispose();
         PictoService.Dispose();
     }

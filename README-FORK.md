@@ -54,6 +54,12 @@ on branch `fork/guards`. Kept as close to upstream as possible: the fork's code 
    research NPC (besides the debug button). Hand-ins due and
    held are logged to dalamud.log too. Setting: "Hand in every class's relic" (on by default; off = ICE's job
    only, still with the right-class fix). `ForkRelicQueue.cs`.
+7. **A hard stop (IPC `ICE.HardStop`).** Asked by BoatRunner when the boat (or a step above ICE) cannot wait any longer:
+   at the next safe moment (never mid-craft or at a gathering node: a craft just ended, or the character on its way to
+   the next node) Artisan's endurance is turned off, the moon's recipe window closed (out of the crafting table, as the
+   turn-in does), ICE switched off, the mission abandoned and a retainer break ended. `IsBusy` stays true until done; a
+   start (`ICE.Enable`) clears a hard stop never carried out. The soft stop stays upstream's "stop after current" (the
+   mission ends however long it takes). `ICE.Tests` (`HardStopTests`).
 
 ## Hook points (for merges from upstream)
 

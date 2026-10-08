@@ -15,7 +15,13 @@ public class ForkIpc
     [EzIPC] public bool IsFork() => true;
 
     /// <summary>The local plugins' standard status call: ICE is working (a mission, the hub, a retainer stop).</summary>
-    [EzIPC] public bool IsBusy() => SchedulerMain.State != IceState.Idle || ForkAutoRetainer.InBreak;
+    [EzIPC] public bool IsBusy() => SchedulerMain.State != IceState.Idle || ForkAutoRetainer.InBreak || ForkHardStop.Requested;
+
+    /// <summary>
+    ///     Item 7: the hard stop. At the next safe moment (a craft ended, not at a node) the mission is abandoned, out of the crafting
+    ///     table, and ICE stops; IsBusy until done. The soft stop is upstream's ChangeSetting("StopAfterCurrent", true).
+    /// </summary>
+    [EzIPC] public void HardStop() => ForkHardStop.Request();
 
     /// <summary>Why a relic hand-in for this job (8-18) would be held now; "" when it may go ahead.</summary>
     [EzIPC] public string RelicHandInBlocker(uint job) => ForkRelicGuard.Blocker(job) ?? "";
